@@ -348,6 +348,48 @@ test("preserves a live session rename across concurrent session and family reads
   }
 })
 
+test("applies live session metadata updates", async () => {
+  const listeners = new Set<Parameters<CreateDataInput["event"]["listen"]>[0]>()
+  const current = session(0)
+  const api = OpenCode.make({
+    baseUrl: "http://opencode.local",
+    fetch: async (input, init) => {
+      const request = input instanceof Request ? input : new Request(input, init)
+      if (!request.url.endsWith(`/api/session/${current.id}`)) return Response.json({ data: [], cursor: {} })
+      return Response.json({ data: current })
+    },
+  })
+  const setup = createRoot((dispose) => ({
+    data: createData({
+      api: () => api,
+      directory: "/project",
+      event: {
+        on: () => () => {},
+        listen(handler) {
+          listeners.add(handler)
+          return () => listeners.delete(handler)
+        },
+      },
+    }),
+    dispose,
+  }))
+
+  try {
+    await setup.data.session.sync(current.id)
+    const event: OpenCodeEvent = {
+      id: "evt_metadata",
+      created: 1,
+      type: "session.metadata.updated",
+      durable: { aggregateID: current.id, seq: 1, version: 1 },
+      data: { sessionID: current.id, metadata: { goal: "ship it" } },
+    }
+    listeners.forEach((listener) => listener({ name: event.type, details: event }))
+    expect(setup.data.session.get(current.id)?.metadata).toEqual({ goal: "ship it" })
+  } finally {
+    setup.dispose()
+  }
+})
+
 test("updates authoritative cached project metadata from live events", async () => {
   const listeners = new Set<Parameters<CreateDataInput["event"]["listen"]>[0]>()
   const original: Project = {

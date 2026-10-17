@@ -11,6 +11,7 @@ import {
 import { Tooltip } from "@opencode/ui/tooltip"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { useNavigate } from "@solidjs/router"
+import { Schema } from "effect"
 import { createMemo, For, Show, type ParentProps } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useServer } from "@/runtime/server/current"
@@ -28,6 +29,8 @@ import { showToast } from "@/shell/notifications/toast"
 import { sessionTitle } from "./title"
 import { SessionWorkingIndicator } from "./header/session-working-indicator"
 import "./session-identity-header.css"
+
+const isText = Schema.is(Schema.String)
 
 export function SessionTitleHeader(props: ParentProps) {
   return (
@@ -355,6 +358,13 @@ export function SessionIdentityHeader(props: ParentProps<{ sessionID: string; se
     () => props.session?.location.directory ?? pending()?.draft.directory ?? info()?.directory,
   )
 
+  // Set by the server's /goal command; cleared when the goal completes.
+  const goal = createMemo(() => {
+    const value = server.ctx.data.session.get(props.sessionID)?.metadata?.goal
+
+    return isText(value) ? value : undefined
+  })
+
   const title = createMemo(() =>
     pending()
       ? language.t("session.tab.session")
@@ -409,6 +419,17 @@ export function SessionIdentityHeader(props: ParentProps<{ sessionID: string; se
                   >
                     {value()}
                   </h1>
+                )}
+              </Show>
+              <Show when={!parentID() && goal()}>
+                {(value) => (
+                  <span
+                    dir="auto"
+                    title={value()}
+                    class="min-w-0 truncate px-1 text-[12px] leading-4 text-v2-text-text-muted"
+                  >
+                    {language.t("session.goal.label", { goal: value() })}
+                  </span>
                 )}
               </Show>
               <Show when={!parentID()}>{props.children}</Show>

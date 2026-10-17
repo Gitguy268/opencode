@@ -550,6 +550,7 @@ export const dict = {
   "session.queue.attachments.one": "{{count}} attachment",
   "session.queue.attachments.other": "{{count}} attachments",
   "session.timeline.working": "Working",
+  "session.goal.label": "Goal: {{goal}}",
   "session.running.working.one": "{{count}} working",
   "session.running.working.other": "{{count}} working",
   "session.running.running.one": "{{count}} running",

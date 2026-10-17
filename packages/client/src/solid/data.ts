@@ -744,6 +744,10 @@ export function createData(config: CreateDataInput) {
         if (store.session.info[event.data.sessionID])
           setStore("session", "info", event.data.sessionID, "permissions", event.data.permissions)
         return
+      case "session.metadata.updated":
+        if (store.session.info[event.data.sessionID])
+          setStore("session", "info", event.data.sessionID, "metadata", event.data.metadata)
+        return
       case "session.moved": {
         const current = store.session.info[event.data.sessionID]
         if (current) {
