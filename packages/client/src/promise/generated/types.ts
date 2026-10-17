@@ -118,6 +118,13 @@ export type SessionInboxSyntheticPayload = { text: string; description?: string;
 
 export type SessionInboxCompactionPayload = {}
 
+export type SessionContextUsageResponse = {
+  data: {
+    limit?: number | undefined
+    sections: Array<{ kind: "system" | "instructions" | "tools" | "messages"; name: string; tokens: number }>
+  }
+}
+
 export type InstructionEntryKey = string
 
 export type SessionGenerateResponse = { data: { text: string } }
@@ -4706,6 +4713,10 @@ export type SessionRevertCommitOutput = void
 export type SessionContextInput = { readonly sessionID: { readonly sessionID: string }["sessionID"] }
 
 export type SessionContextOutput = { data: Array<SessionMessageInfo> }["data"]
+
+export type SessionContextUsageInput = { readonly sessionID: { readonly sessionID: string }["sessionID"] }
+
+export type SessionContextUsageOutput = SessionContextUsageResponse["data"]
 
 export type SessionDiffInput = {
   readonly sessionID: { readonly sessionID: string }["sessionID"]

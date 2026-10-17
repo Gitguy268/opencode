@@ -575,6 +575,21 @@ export const SessionHandler = HttpApiBuilder.group(Api, "server.session", (handl
         }),
       )
       .handle(
+        "session.contextUsage",
+        Effect.fn(function* (ctx) {
+          const data = yield* session
+            .contextUsage({ sessionID: ctx.params.sessionID })
+            .pipe(
+              Effect.mapError((error) =>
+                error._tag === "Session.NotFoundError"
+                  ? missingSession(error)
+                  : new ServiceUnavailableError({ message: error.message, service: "session context usage" }),
+              ),
+            )
+          return { data }
+        }),
+      )
+      .handle(
         "session.log",
         Effect.fn(function* (ctx) {
           yield* session.get(ctx.params.sessionID).pipe(Effect.catchTag("Session.NotFoundError", missingSession))

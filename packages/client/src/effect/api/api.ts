@@ -363,6 +363,19 @@ export type SessionContextInput = { readonly sessionID: Session.ID }
 export type SessionContextOutput = ReadonlyArray<SessionMessage.Info>
 export type SessionContextOperation<E = never> = (input: SessionContextInput) => Effect.Effect<SessionContextOutput, E>
 
+export type SessionContextUsageInput = { readonly sessionID: Session.ID }
+export type SessionContextUsageOutput = {
+  readonly limit?: number | undefined
+  readonly sections: ReadonlyArray<{
+    readonly kind: "system" | "instructions" | "tools" | "messages"
+    readonly name: string
+    readonly tokens: number
+  }>
+}
+export type SessionContextUsageOperation<E = never> = (
+  input: SessionContextUsageInput,
+) => Effect.Effect<SessionContextUsageOutput, E>
+
 export type SessionDiffInput = {
   readonly sessionID: Session.ID
   readonly from?: SessionMessage.ID | undefined
@@ -1326,6 +1339,7 @@ export interface SessionApi<E = never> {
     readonly commit: SessionRevertCommitOperation<E>
   }
   readonly context: SessionContextOperation<E>
+  readonly contextUsage: SessionContextUsageOperation<E>
   readonly diff: SessionDiffOperation<E>
   readonly inbox: {
     readonly list: SessionInboxListOperation<E>

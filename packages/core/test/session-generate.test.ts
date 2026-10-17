@@ -31,6 +31,7 @@ import { ReferenceInstructions } from "@opencode/core/reference/instructions"
 import { AbsolutePath } from "@opencode/core/schema"
 import { SessionEvent } from "@opencode/core/session/event"
 import { SessionContext } from "@opencode/core/session/context"
+import { SessionContextUsage } from "@opencode/core/session/context-usage"
 import { SessionGenerate } from "@opencode/core/session/generate"
 import { InstructionState } from "@opencode/core/session/instruction-state"
 import { SessionMessage } from "@opencode/core/session/message"
@@ -413,4 +414,37 @@ it.effect(
       expect(yield* durableState(db, sessionID)).toEqual(before)
     }),
   { timeout: 15_000 },
+)
+
+it.effect("estimates context usage by section without a model call or durable mutation", () =>
+  Effect.gen(function* () {
+    requests.length = 0
+    instruction = "Initial context"
+    const { db, bus, instructions, session, instances } = yield* setup
+    yield* InstructionState.prepare(db, bus, instructions, sessionID)
+    const message = SessionMessage.ID.create()
+    yield* bus.publish(SessionEvent.InboxEnqueued, {
+      sessionID,
+      inboxID: message,
+      item: { type: "user", payload: { text: "Existing durable context" }, delivery: "steer" },
+    })
+    yield* bus.publish(SessionEvent.InboxDelivered, { sessionID, inboxID: message })
+    // A changed instruction would be narrated by a real request; the estimate must not observe it.
+    instruction = "Changed context"
+    const before = yield* durableState(db, sessionID)
+
+    const usage = yield* SessionContextUsage.usage({ session }).pipe(Effect.provideService(Instance.Service, instances))
+
+    expect(requests).toEqual([])
+    expect(yield* durableState(db, sessionID)).toEqual(before)
+    expect(usage.limit).toBe(200_000)
+    expect(usage.sections.map((section) => [section.kind, section.name])).toEqual([
+      ["system", "System prompt"],
+      ["instructions", "core/codemode"],
+      ["instructions", "test/context"],
+      ["tools", "lookup"],
+      ["messages", "Messages (1)"],
+    ])
+    expect(usage.sections.every((section) => section.tokens > 0)).toBe(true)
+  }),
 )

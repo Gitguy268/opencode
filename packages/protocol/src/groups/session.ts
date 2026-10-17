@@ -500,6 +500,33 @@ export const makeSessionGroup = <I extends HttpApiMiddleware.AnyId, S, FormI ext
       ),
     )
     .add(
+      HttpApiEndpoint.get("session.contextUsage", "/api/session/:sessionID/context/usage", {
+        params: { sessionID: Session.ID },
+        success: Schema.Struct({
+          data: Schema.Struct({
+            limit: Schema.Number.pipe(Schema.optional),
+            sections: Schema.Array(
+              Schema.Struct({
+                kind: Schema.Literals(["system", "instructions", "tools", "messages"]),
+                name: Schema.String,
+                tokens: Schema.Number,
+              }),
+            ),
+          }),
+        }).annotate({ identifier: "SessionContextUsageResponse" }),
+        error: [SessionNotFoundError, ServiceUnavailableError],
+      })
+        .middleware(sessionLocationMiddleware)
+        .annotateMerge(
+          OpenApi.annotations({
+            identifier: "session.contextUsage",
+            summary: "Estimate session context usage",
+            description:
+              "Estimate, by section, the tokens the next request would send: system prompt, each instruction source, each tool, and messages. Read-only.",
+          }),
+        ),
+    )
+    .add(
       HttpApiEndpoint.get("session.diff", "/api/session/:sessionID/diff", {
         params: { sessionID: Session.ID },
         query: Schema.Struct({

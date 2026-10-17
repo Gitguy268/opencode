@@ -46,6 +46,7 @@ import { SessionEvent } from "./session/event.js"
 import { SessionInbox } from "./session/inbox.js"
 import { InstructionState } from "./session/instruction-state.js"
 import { SessionGenerate } from "./session/generate.js"
+import { SessionContextUsage } from "./session/context-usage.js"
 import { SessionCommand } from "./session/command.js"
 import {
   SessionMove,
@@ -200,6 +201,10 @@ export interface Interface {
     sessionID: SessionSchema.ID
     prompt: string
   }) => Effect.Effect<string, NotFoundError | SessionGenerate.Error>
+  /** Estimates, by section, what the next request would send. Read-only. */
+  readonly contextUsage: (input: {
+    sessionID: SessionSchema.ID
+  }) => Effect.Effect<SessionContextUsage.Usage, NotFoundError | SessionGenerate.Error>
   readonly command: (input: {
     sessionID: SessionSchema.ID
     command: string
@@ -452,6 +457,13 @@ const layer = Layer.effect(
           Effect.provideService(Instance.Service, instances),
           Effect.provideService(Database.Service, database),
           Effect.provideService(LLMClient.Service, llm),
+        )
+      }),
+      contextUsage: Effect.fn("Session.contextUsage")(function* (input) {
+        const session = yield* result.get(input.sessionID)
+        return yield* SessionContextUsage.usage({ session }).pipe(
+          Effect.provideService(Instance.Service, instances),
+          Effect.provideService(Database.Service, database),
         )
       }),
       command: Effect.fn("Session.command")(function* (input) {

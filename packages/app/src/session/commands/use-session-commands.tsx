@@ -321,6 +321,20 @@ export const useSessionCommands = (actions: SessionCommandContext) => {
     )
   }
 
+  const showContext = () => {
+    const sessionID = actions.session.identity.params.id
+
+    if (!sessionID) return
+    void openDialog(
+      () =>
+        Promise.all([
+          serverSDK.api.session.contextUsage({ sessionID }),
+          import("@/session/commands/dialog-context-usage"),
+        ]),
+      ([usage, x]) => dialog.show(() => <x.default usage={usage} cost={data.session.cost(sessionID)} />),
+    ).catch((cause) => showToast({ title: formatServerError(cause, language.t, language.t("common.requestFailed")) }))
+  }
+
   const sessionCmds = () => [
     sessionCommand({
       id: "session.new",
@@ -359,6 +373,14 @@ export const useSessionCommands = (actions: SessionCommandContext) => {
       keybind: "ctrl+b",
       disabled: !actions.background.blocking(),
       onSelect: actions.background.move,
+    }),
+    sessionCommand({
+      id: "session.context",
+      title: language.t("command.session.context"),
+      description: language.t("command.session.context.description"),
+      slash: "context",
+      disabled: !actions.session.identity.params.id,
+      onSelect: showContext,
     }),
     sessionCommand({
       id: "session.fork",

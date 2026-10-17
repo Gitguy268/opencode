@@ -70,6 +70,8 @@ import { DialogMessage } from "./dialog-message"
 import { DialogFork } from "./dialog-fork"
 import { DialogTimeline } from "./dialog-timeline"
 import { DialogFind } from "./dialog-find"
+import { formatContextUsage } from "./context-usage"
+import { DialogAlert } from "../../ui/dialog-alert"
 import { Composer } from "./composer"
 import { filetype } from "../../util/filetype"
 import parsers from "../../parsers-config"
@@ -932,6 +934,22 @@ export function Session(props: {
             setPrompt={(value) => promptRef.current?.set(value)}
           />
         ))
+      },
+    },
+    {
+      title: "Show context usage",
+      id: "session.context",
+      group: "Session",
+      slash: { name: "context" },
+      run: () => {
+        client.api.session
+          .contextUsage({ sessionID: route.sessionID })
+          .then((usage) =>
+            dialog.replace(() => (
+              <DialogAlert title="Context" message={formatContextUsage(usage, data.session.cost(route.sessionID))} />
+            )),
+          )
+          .catch((error) => toast.error(error))
       },
     },
     {
