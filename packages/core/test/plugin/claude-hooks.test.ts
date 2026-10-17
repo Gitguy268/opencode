@@ -32,6 +32,7 @@ const run = Effect.fnUntraced(function* (input: {
   readonly user?: Record<string, unknown>
   readonly project?: Record<string, unknown>
   readonly scope?: false | "user" | "all"
+  readonly parentID?: string
 }) {
   const tmp = yield* Effect.acquireRelease(
     Effect.promise(() => tmpdir()),
@@ -70,6 +71,9 @@ const run = Effect.fnUntraced(function* (input: {
       },
       event: { subscribe: () => Stream.fromQueue(events) },
       session: {
+        // Only parentID is read.
+        // oxlint-disable-next-line typescript-eslint/no-unsafe-type-assertion
+        get: () => Effect.succeed({ parentID: input.parentID } as never),
         hook: (name, callback) => {
           // oxlint-disable-next-line typescript-eslint/no-unsafe-type-assertion
           if (name === "prompt") captured.prompt = callback as never
@@ -202,19 +206,18 @@ describe("Claude Code hooks", () => {
 
   it.live("continues a session when a Stop hook blocks, and passes stop_hook_active on the next stop", () =>
     Effect.gen(function* () {
-      const hooks = yield* run({
-        user: {
-          Stop: [
-            {
-              hooks: [
-                command(
-                  `case "$(cat)" in *'"stop_hook_active":true'*) exit 0;; esac; echo '{"decision":"block","reason":"tests not run"}'`,
-                ),
-              ],
-            },
-          ],
-        },
-      })
+      const stop = {
+        Stop: [
+          {
+            hooks: [
+              command(
+                `case "$(cat)" in *'"stop_hook_active":true'*) exit 0;; esac; echo '{"decision":"block","reason":"tests not run"}'`,
+              ),
+            ],
+          },
+        ],
+      }
+      const hooks = yield* run({ user: stop })
       yield* Queue.offer(hooks.events, succeeded())
       yield* Effect.promise(async () => {
         for (const _ of Array.from({ length: 400 })) {
@@ -226,6 +229,11 @@ describe("Claude Code hooks", () => {
       yield* Queue.offer(hooks.events, succeeded())
       yield* Effect.promise(() => Bun.sleep(300))
       expect(hooks.prompts).toHaveLength(1)
+
+      const child = yield* run({ user: stop, parentID: "ses_parent" })
+      yield* Queue.offer(child.events, succeeded())
+      yield* Effect.promise(() => Bun.sleep(300))
+      expect(child.prompts).toEqual([])
     }),
   )
 })

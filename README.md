@@ -49,7 +49,7 @@ This is a personal fork of [anomalyco/opencode](https://github.com/anomalyco/ope
 
 | Feature | How to use it | Upstream request |
 | --- | --- | --- |
-| Session goals | `/goal <text>` sets a goal and starts work. The agent keeps going after each successful run until it calls `goal_complete`, you run `/goal clear`, or 20 turns pass. The goal shows in the TUI sidebar and the app header. | [#27167](https://github.com/anomalyco/opencode/issues/27167) |
+| Session goals | `/goal <text>` sets a goal and starts work. The agent keeps going after each successful run until it calls `goal_complete`, you run `/goal clear`, or 20 unattended turns pass. If it is blocked it pauses, keeping the goal, and your next message resumes it. The goal shows in the TUI sidebar and the app header. | [#27167](https://github.com/anomalyco/opencode/issues/27167) |
 | Context breakdown | `/context` estimates the tokens used by the system prompt, each instruction source, each tool and the messages, and shows the session cost including subagents. | [#6152](https://github.com/anomalyco/opencode/issues/6152) |
 | Transcript search (TUI) | `/find` (or `/search`) searches user and assistant text and jumps to the message. The app already had Cmd+F. | [#4714](https://github.com/anomalyco/opencode/issues/4714) |
 | Inline skills | Type `$skill-id` or `$skill-name` in a prompt to load that skill. Text that matches no skill, like `$HOME`, is left alone. | [#15617](https://github.com/anomalyco/opencode/issues/15617) |
@@ -59,7 +59,7 @@ This is a personal fork of [anomalyco/opencode](https://github.com/anomalyco/ope
 | Shell sandbox (macOS) | `"experimental": { "sandbox": true }` lets shell commands write only to the project, temp folders and package caches. | [#2242](https://github.com/anomalyco/opencode/issues/2242) |
 | SearXNG search | Set `SEARXNG_URL` (for example `http://127.0.0.1:8888`), then choose `"websearch": { "provider": "searxng" }`. | — |
 
-The docs pages for each feature are updated under `services/www/src/docs/content`: commands in `skills.mdx`, `tools.mdx` and `websearch.mdx`, plus `permissions.mdx` and `plugins.mdx`.
+Inline skills, hooks, auto mode, the sandbox, the subagent cap and SearXNG are also documented in `services/www/src/docs/content` (`skills.mdx`, `plugins.mdx`, `permissions.mdx`, `tools.mdx`, `websearch.mdx`). `/goal`, `/context` and `/find` are documented only here.
 
 <details>
 <summary>Limits and things not done</summary>

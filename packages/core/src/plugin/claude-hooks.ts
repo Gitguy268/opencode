@@ -239,6 +239,8 @@ export const Plugin = define({
       Stream.runForEach((event) =>
         Effect.gen(function* () {
           const sessionID = event.data.sessionID
+          // Claude Code runs Stop for the main agent only; subagents have their own SubagentStop event.
+          if ((yield* ctx.session.get({ sessionID })).parentID) return
           const count = stops.get(sessionID) ?? 0
           const result = yield* runAll("Stop", { session_id: sessionID, stop_hook_active: count > 0 })
           if (!result.block || count >= maxStopContinuations) return

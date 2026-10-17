@@ -1,7 +1,7 @@
 import { describe, expect } from "bun:test"
 import { Effect, Queue, Schema, Stream } from "effect"
 import type { CommandDefinition } from "@opencode/plugin/effect/command"
-import type { SessionContext } from "@opencode/plugin/effect/session"
+import type { SessionContext, SessionHooks } from "@opencode/plugin/effect/session"
 import { Agent } from "@opencode/core/agent"
 import { Event } from "@opencode/schema/event"
 import { Model } from "@opencode/core/model"
@@ -47,6 +47,7 @@ const run = Effect.fnUntraced(function* () {
     command?: CommandDefinition
     tool?: Tool.Info
     context?: (input: SessionContext) => Effect.Effect<void>
+    prompt?: (input: SessionHooks["prompt"]) => Effect.Effect<void>
   } = {}
   const entries = InstructionEntry.Service.of({
     list: () => Effect.sync(() => Array.from(stored, ([key, value]) => ({ key, value }))),
@@ -79,6 +80,7 @@ const run = Effect.fnUntraced(function* () {
       session: {
         hook: (name, callback) => {
           if (name === "context") captured.context = callback as (input: SessionContext) => Effect.Effect<void>
+          if (name === "prompt") captured.prompt = callback as (input: SessionHooks["prompt"]) => Effect.Effect<void>
           return Effect.succeed({ dispose: Effect.void })
         },
         // The plugin reads only metadata from the session.
@@ -92,8 +94,8 @@ const run = Effect.fnUntraced(function* () {
       },
     }),
   ).pipe(Effect.provideService(InstructionEntry.Service, entries))
-  const { command, tool, context } = captured
-  if (!command || !tool || !context) return yield* Effect.die("goal plugin did not register everything")
+  const { command, tool, context, prompt } = captured
+  if (!command || !tool || !context || !prompt) return yield* Effect.die("goal plugin did not register everything")
   const settle = (count: number) =>
     Effect.promise(async () => {
       for (const _ of Array.from({ length: 1000 })) {
@@ -101,7 +103,7 @@ const run = Effect.fnUntraced(function* () {
         await Bun.sleep(1)
       }
     })
-  return { stored, metadata, prompts, events, command, tool, context, settle }
+  return { stored, metadata, prompts, events, command, tool, context, prompt, settle }
 })
 
 const invoke = (command: CommandDefinition, text: string) =>
@@ -163,6 +165,40 @@ describe("goal plugin", () => {
       expect(goal.stored.get(GoalPlugin.key)).toBe("again")
       yield* invoke(goal.command, "clear")
       expect(goal.stored.has(GoalPlugin.key)).toBe(false)
+    }),
+  )
+
+  it.effect("pauses when the model is blocked and resumes on the user's next prompt", () =>
+    Effect.gen(function* () {
+      const goal = yield* run()
+      yield* invoke(goal.command, "ship it")
+      const result = yield* goal.tool
+        .execute(
+          { summary: "need the deploy token", blocked: true },
+          {
+            sessionID,
+            agent: Agent.ID.make("build"),
+            messageID: SessionMessage.ID.make("msg_goal"),
+            id: Tool.CallID.make("call_goal"),
+            progress: () => Effect.void,
+          },
+        )
+        .pipe(Effect.orDie)
+      expect(result.content).toBe("Goal paused until the user replies: need the deploy token")
+      expect(goal.stored.get(GoalPlugin.key)).toBe("ship it")
+      yield* Queue.offer(goal.events, succeeded())
+      yield* Effect.promise(() => Bun.sleep(20))
+      expect(goal.prompts).toHaveLength(1)
+
+      yield* goal.prompt({
+        sessionID,
+        messageID: SessionMessage.ID.make("msg_user"),
+        prompt: { text: "the token is in 1Password" },
+        delivery: "steer",
+      })
+      yield* Queue.offer(goal.events, succeeded())
+      yield* goal.settle(2)
+      expect(goal.prompts[1]).toContain("Continue working toward the session goal")
     }),
   )
 })
