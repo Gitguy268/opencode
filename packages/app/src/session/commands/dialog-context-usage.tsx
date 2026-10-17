@@ -24,7 +24,7 @@ export default function DialogContextUsage(props: { usage: SessionContextUsageOu
   })
 
   return (
-    <Dialog>
+    <Dialog fit>
       <DialogHeader>
         <DialogTitleGroup
           title={language.t("session.context.title")}
@@ -40,7 +40,7 @@ export default function DialogContextUsage(props: { usage: SessionContextUsageOu
         />
       </DialogHeader>
       <DialogBody>
-        <div class="flex flex-col gap-2 text-[13px] leading-5">
+        <div class="flex flex-col gap-2 pb-5 ps-6 pe-6 text-[13px] leading-5">
           <For each={groups}>
             {(group) => (
               <details>

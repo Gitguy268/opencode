@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, on, onCleanup, Show, type Accessor, type JSX } from "solid-js"
 import { createStore } from "solid-js/store"
-import { Predicate } from "effect"
+import { Predicate, Schema } from "effect"
 import { createAnimatedPresence } from "@/runtime/animated-presence"
 import type { SessionUserActions } from "@opencode/session-ui/actions"
 import { Button } from "@opencode/ui/button"
@@ -28,6 +28,8 @@ import { useCommand } from "@/shell/commands/command"
 import { SessionAncestorTrail, SessionProjectMenu, SessionTitleHeader } from "../session-identity-header"
 import { SessionHeaderSpacer } from "@/session/header/session-header"
 import { SessionRunningMenu } from "@/session/header/session-running-menu"
+
+const isText = Schema.is(Schema.String)
 
 type BlockingTask = { type: "shell" | "subagent"; partID: string; id?: string; label?: string }
 
@@ -133,6 +135,15 @@ function MessageTimelineView(
   const parentID = props.data.parentID
   const parentTitle = props.data.parentTitle
   const childTitle = props.data.childTitle
+
+  // Set by the server's /goal command; cleared when the goal completes.
+  const goal = createMemo(() => {
+    const id = sessionID()
+    const value = id ? data.session.get(id)?.metadata?.goal : undefined
+
+    return isText(value) ? value : undefined
+  })
+
   const projection = props.data.projection
   const sessionDirectory = createMemo(() => props.session.data.info()?.location.directory ?? sdk().directory)
 
@@ -584,6 +595,17 @@ function MessageTimelineView(
                           </Menu.Content>
                         </Menu.Portal>
                       </Menu>
+                    )}
+                  </Show>
+                  <Show when={!parentID() && goal()}>
+                    {(value) => (
+                      <span
+                        dir="auto"
+                        title={value()}
+                        class="min-w-0 truncate px-1 text-[12px] leading-4 text-v2-text-text-muted"
+                      >
+                        {language.t("session.goal.label", { goal: value() })}
+                      </span>
                     )}
                   </Show>
                 </div>
