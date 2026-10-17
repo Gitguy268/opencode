@@ -476,6 +476,15 @@ function normalizeExperimental(
         )
         if (value !== undefined) result.subagent_depth = value
       }
+      if (own(experimental, "subagent_parallel")) {
+        const value = decodeEncoded(
+          ConfigExperimental.Info.fields.subagent_parallel,
+          experimental.subagent_parallel,
+          ["experimental", "subagent_parallel"],
+          diagnostics,
+        )
+        if (value !== undefined) result.subagent_parallel = value
+      }
       if (own(experimental, "auto_mode")) {
         const value = decodeEncoded(
           ConfigExperimental.Info.fields.auto_mode,

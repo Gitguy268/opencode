@@ -517,7 +517,11 @@ describe("ConfigNormalize", () => {
   })
 
   test("keeps fork experimental settings and rejects invalid values", () => {
-    expect(normalized({ experimental: { auto_mode: true } }).encoded.experimental).toEqual({ auto_mode: true })
+    expect(normalized({ experimental: { auto_mode: true, subagent_parallel: 2 } }).encoded.experimental).toEqual({
+      subagent_parallel: 2,
+      auto_mode: true,
+    })
+    expect(normalized({ experimental: { subagent_parallel: 0 } }).encoded.experimental).toBeUndefined()
     const invalid = normalized({ experimental: { auto_mode: "yes" } })
     expect(invalid.encoded.experimental).toBeUndefined()
     expect(invalid.diagnostics.map((item) => item.path)).toContainEqual(["experimental", "auto_mode"])

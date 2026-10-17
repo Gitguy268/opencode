@@ -57,6 +57,10 @@ const tokens = { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 }
 const outputSessionID = (value: unknown) =>
   Schema.decodeUnknownSync(Schema.Struct({ sessionID: Session.ID }))(value).sessionID
 
+// Children titled "gated" stay running until the test opens the gate, so concurrency can be observed.
+const gate = { ...Promise.withResolvers<void>(), running: new Set<Session.ID>(), max: 0 }
+const resetGate = () => Object.assign(gate, Promise.withResolvers<void>(), { running: new Set<Session.ID>(), max: 0 })
+
 const executionNode = makeGlobalNode({
   service: SessionExecution.Service,
   layer: Layer.effect(
@@ -67,6 +71,12 @@ const executionNode = makeGlobalNode({
       const completed = new Set<Session.ID>()
       const complete = Effect.fn("SubagentTest.complete")(function* (sessionID: Session.ID) {
         if (completed.has(sessionID)) return
+        if ((yield* store.get(sessionID))?.title?.includes("gated")) {
+          gate.running.add(sessionID)
+          gate.max = Math.max(gate.max, gate.running.size)
+          yield* Effect.promise(() => gate.promise)
+          gate.running.delete(sessionID)
+        }
         if ((yield* store.get(sessionID))?.title?.includes("fail")) {
           yield* new SessionRunnerModel.ModelNotSelectedError({ sessionID })
           return
@@ -399,6 +409,61 @@ describe("SubagentTool", () => {
         }),
       ),
     ),
+  )
+
+  const runGated = (config: object) =>
+    Effect.acquireRelease(
+      Effect.promise(() => tmpdir()),
+      (dir) => Effect.promise(() => dir[Symbol.asyncDispose]()),
+    ).pipe(
+      Effect.flatMap((dir) =>
+        Effect.gen(function* () {
+          resetGate()
+          yield* Effect.promise(() => Bun.write(path.join(dir.path, "opencode.json"), JSON.stringify(config)))
+          const location = Location.Ref.make({ directory: AbsolutePath.make(dir.path) })
+          const sessions = yield* Session.Service
+          const parent = yield* sessions.create({ location, model: parentModel })
+          yield* withSubagent(parent.location)
+          const locations = yield* LocationServiceMap.Service
+          const registry = yield* Tool.Service.pipe(Effect.provide(locations.get(parent.location)))
+          const calls = yield* Effect.forEach([1, 2, 3, 4], (index) =>
+            executeTool(registry, {
+              sessionID: parent.id,
+              ...toolIdentity,
+              call: {
+                type: "tool-call",
+                id: `call-gated-${index}`,
+                name: SubagentTool.name,
+                input: { agent: "reviewer", description: `gated ${index}`, prompt: "wait" },
+              },
+            }).pipe(Effect.forkChild),
+          )
+          // Give every call time to reach its child, then hold to see whether more start.
+          yield* Effect.promise(async () => {
+            for (const _ of Array.from({ length: 500 })) {
+              if (gate.running.size >= 2) break
+              await Bun.sleep(5)
+            }
+            await Bun.sleep(100)
+          })
+          const runningWhileGated = gate.running.size
+          gate.resolve()
+          const settled = yield* Effect.forEach(calls, (fiber) => Fiber.join(fiber))
+          return { runningWhileGated, max: gate.max, settled }
+        }),
+      ),
+    )
+
+  it.live("caps how many subagents one session runs at once", () =>
+    Effect.gen(function* () {
+      const capped = yield* runGated({ experimental: { subagent_parallel: 2 } })
+      expect(capped.runningWhileGated).toBe(2)
+      expect(capped.max).toBe(2)
+      expect(capped.settled.map((item) => item.status)).toEqual(["completed", "completed", "completed", "completed"])
+
+      const uncapped = yield* runGated({})
+      expect(uncapped.runningWhileGated).toBe(4)
+    }),
   )
 
   it.live("runs a foreground child session and returns the final assistant text", () =>

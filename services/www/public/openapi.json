@@ -14180,6 +14180,10 @@
                 "type": "integer",
                 "minimum": 0
               },
+              "subagent_parallel": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              },
               "auto_mode": {
                 "type": "boolean"
               },

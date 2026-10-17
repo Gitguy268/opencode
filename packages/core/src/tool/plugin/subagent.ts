@@ -3,7 +3,7 @@ export * as SubagentTool from "./subagent.js"
 import { ToolFailure } from "@opencode/ai"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { SessionHooks } from "@opencode/plugin/effect/session"
-import { Effect, Predicate, Schema } from "effect"
+import { Effect, Predicate, Schema, Scope, Semaphore } from "effect"
 import { Agent } from "../../agent.js"
 import { Config } from "../../config.js"
 import { Job } from "../../job.js"
@@ -71,6 +71,10 @@ export const Plugin = {
     const permission = yield* Permission.Service
     const models = yield* Model.Service
     const subagents = yield* SubagentJob.Service
+    const scope = yield* Scope.Scope
+    // Keyed by the spawning session, not the root, so a nested child never waits on its own ancestors' permits.
+    // shortcut: entries live for the server's lifetime, one small semaphore per session that ever spawned a subagent.
+    const running = new Map<string, Semaphore.Semaphore>()
 
     const resolveModel = Effect.fn("SubagentTool.resolveModel")(function* (input: string) {
       const ref = yield* Effect.try({
@@ -198,25 +202,14 @@ export const Plugin = {
                   ))
 
               const background = input.background === true
-              yield* context.progress({ sessionID: child.id, status: "running" })
-
-              // Standard prompt admission outside the job: Job.start joining a running child skips
-              // its run effect, and the default wake starts an idle child or steers a running one.
-              yield* sessions
-                .prompt({
-                  sessionID: child.id,
-                  text:
-                    existing === undefined
-                      ? ["You are a subagent spawned by another session.", input.prompt].join("\n")
-                      : input.prompt,
-                  ...(background && existing === undefined ? { resume: false } : {}),
-                })
-                .pipe(
-                  Effect.mapError(
-                    (error) => new ToolFailure({ message: `Failed to prompt subagent: ${child.id}`, error }),
-                  ),
-                )
-
+              const parallel = Config.latest(yield* config.entries(), "experimental")?.subagent_parallel
+              const permits =
+                parallel === undefined ? undefined : (running.get(context.sessionID) ?? Semaphore.makeUnsafe(parallel))
+              if (permits && parallel !== undefined) {
+                running.set(context.sessionID, permits)
+                yield* Semaphore.resize(permits, parallel)
+              }
+              const release = permits ? Semaphore.release(permits, 1) : Effect.void
               const recovery = {
                 kind: "subagent" as const,
                 parentSessionID: context.sessionID,
@@ -224,7 +217,41 @@ export const Plugin = {
                 agent: agent.name,
                 description: input.description,
               }
-              yield* subagents.start(recovery)
+
+              // Only the waits are interruptible, so a taken permit always reaches the release below.
+              yield* Effect.uninterruptibleMask((restore) =>
+                Effect.gen(function* () {
+                  if (permits) yield* restore(Semaphore.take(permits, 1))
+                  yield* restore(
+                    Effect.gen(function* () {
+                      yield* context.progress({ sessionID: child.id, status: "running" })
+
+                      // Standard prompt admission outside the job: Job.start joining a running child skips
+                      // its run effect, and the default wake starts an idle child or steers a running one.
+                      yield* sessions
+                        .prompt({
+                          sessionID: child.id,
+                          text:
+                            existing === undefined
+                              ? ["You are a subagent spawned by another session.", input.prompt].join("\n")
+                              : input.prompt,
+                          ...(background && existing === undefined ? { resume: false } : {}),
+                        })
+                        .pipe(
+                          Effect.mapError(
+                            (error) => new ToolFailure({ message: `Failed to prompt subagent: ${child.id}`, error }),
+                          ),
+                        )
+                    }),
+                  ).pipe(Effect.onError(() => release))
+                  yield* subagents.start(recovery)
+                  // Background and backgrounded children keep running after this call, so the permit follows the job.
+                  if (permits)
+                    yield* jobs
+                      .wait({ id: child.id })
+                      .pipe(Effect.ensuring(release), Effect.forkIn(scope, { startImmediately: true }))
+                }),
+              )
 
               if (background) {
                 yield* subagents.background(recovery)
