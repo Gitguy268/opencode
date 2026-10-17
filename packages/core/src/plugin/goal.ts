@@ -45,7 +45,8 @@ export const Plugin = define({
         execute: (input) =>
           Effect.gen(function* () {
             const text = input.prompt.text.trim()
-            if (text === "" || text === "clear" || text === "stop") return yield* clear(input.sessionID)
+            if (text === "") return
+            if (text === "clear" || text === "stop") return yield* clear(input.sessionID)
             continuations.set(input.sessionID, 0)
             yield* entries.put({ sessionID: input.sessionID, key, value: text })
             yield* display(input.sessionID, text)

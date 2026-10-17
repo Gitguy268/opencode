@@ -3,9 +3,11 @@ import { createMemo, Show } from "solid-js"
 
 export function SidebarGoal(props: { context: Plugin.Context; sessionID: string }) {
   const theme = props.context.theme
-  // Set by the server's /goal command; cleared when the goal completes.
+  // Set by the server's /goal command; cleared when the goal completes. Children inherit
+  // metadata but not the goal itself, so only root sessions show it.
   const goal = createMemo(() => {
-    const value = props.context.data.session.get(props.sessionID)?.metadata?.goal
+    const session = props.context.data.session.get(props.sessionID)
+    const value = session?.parentID ? undefined : session?.metadata?.goal
     return typeof value === "string" ? value : undefined
   })
 

@@ -159,6 +159,8 @@ describe("goal plugin", () => {
       yield* Effect.promise(() => Bun.sleep(20))
       expect(goal.prompts).toHaveLength(3 + GoalPlugin.maxContinuations)
 
+      yield* invoke(goal.command, "   ")
+      expect(goal.stored.get(GoalPlugin.key)).toBe("again")
       yield* invoke(goal.command, "clear")
       expect(goal.stored.has(GoalPlugin.key)).toBe(false)
     }),
