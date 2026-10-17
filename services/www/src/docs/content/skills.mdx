@@ -195,7 +195,7 @@ OpenCode then:
 3. Adds the Markdown body, without frontmatter, to the conversation.
 4. Provides the skill's base directory and a sample of up to ten supporting file paths.
 
-To load a skill yourself, mention it in your prompt as `@skill-id`.
+To load a skill yourself, mention it in your prompt as `@skill-id`. Typing `$skill-id` or `$skill-name` works too, in any client; text after `$` that matches no skill, such as `$HOME`, is left as written.
 
 Supporting file contents are not loaded automatically. The agent reads them when the skill directs it to do so. The file sample is available for directory-based `SKILL.md` skills; flat Markdown skills do not receive a neighboring file list.
 
