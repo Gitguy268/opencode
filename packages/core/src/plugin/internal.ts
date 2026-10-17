@@ -103,6 +103,7 @@ import { OptimizePlugin } from "./optimize.js"
 import { VcsGitPlugin } from "./vcs/git.js"
 import { VerbosityPlugin } from "./verbosity.js"
 import { GoalPlugin } from "./goal.js"
+import { AutoModePlugin } from "./auto-mode.js"
 import { InstructionEntry } from "../session/instruction-entry.js"
 import { SkillMentionPlugin } from "./skill-mention.js"
 import { WarmingPlugin } from "./warming.js"
@@ -228,6 +229,7 @@ const pre = [
   AgentPlugin.Plugin,
   PlanPlugin.Plugin,
   GoalPlugin.Plugin,
+  AutoModePlugin.Plugin,
   CommandPlugin.Plugin,
   SkillPlugin.Plugin,
   VcsHgPlugin.Plugin,

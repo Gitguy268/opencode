@@ -476,6 +476,15 @@ function normalizeExperimental(
         )
         if (value !== undefined) result.subagent_depth = value
       }
+      if (own(experimental, "auto_mode")) {
+        const value = decodeEncoded(
+          ConfigExperimental.Info.fields.auto_mode,
+          experimental.auto_mode,
+          ["experimental", "auto_mode"],
+          diagnostics,
+        )
+        if (value !== undefined) result.auto_mode = value
+      }
     }
   }
   if (Object.keys(result).length || (isRecord(input.experimental) && !Object.keys(input.experimental).length))

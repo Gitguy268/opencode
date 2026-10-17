@@ -14180,6 +14180,9 @@
                 "type": "integer",
                 "minimum": 0
               },
+              "auto_mode": {
+                "type": "boolean"
+              },
               "policies": {
                 "type": "array",
                 "items": {

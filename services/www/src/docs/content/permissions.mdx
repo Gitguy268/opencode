@@ -293,6 +293,25 @@ Review broad approvals and remove those no longer needed.
 Clients may attach feedback when rejecting. Non-interactive clients must decide
 how to handle approval requests; configured `deny` rules always remain enforced.
 
+### Auto mode
+
+Auto mode lets a model review `ask` requests for `shell`, `edit`, `read`, `glob`,
+`grep`, `webfetch` and `websearch` before you see them. It approves routine,
+reversible work that fits your latest request and stays inside the project.
+Anything else still asks you, with the reviewer's reason. That includes risky,
+destructive or out-of-project requests, unclear replies, errors, and reviews that
+take longer than 8 seconds. Configured `deny` rules and `external_directory`
+requests are never reviewed.
+
+```jsonc title="opencode.jsonc"
+{
+  "experimental": { "auto_mode": true },
+}
+```
+
+The review uses the default model, and each reviewed request costs one small
+model call.
+
 ## Policies
 
 A [policy](/policies) can hard-deny a permission check after these rules and saved

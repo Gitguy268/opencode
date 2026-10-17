@@ -516,6 +516,13 @@ describe("ConfigNormalize", () => {
     expect(normalized({ enabled_providers: "anthropic" }).encoded.policies).toBeUndefined()
   })
 
+  test("keeps fork experimental settings and rejects invalid values", () => {
+    expect(normalized({ experimental: { auto_mode: true } }).encoded.experimental).toEqual({ auto_mode: true })
+    const invalid = normalized({ experimental: { auto_mode: "yes" } })
+    expect(invalid.encoded.experimental).toBeUndefined()
+    expect(invalid.diagnostics.map((item) => item.path)).toContainEqual(["experimental", "auto_mode"])
+  })
+
   test("merges migrated, experimental, and native policies in order", () => {
     expect(
       normalized({
