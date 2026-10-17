@@ -2328,6 +2328,7 @@ export type ConfigEntry =
           portable_shell_scanner?: boolean
           subagent_depth?: number
           subagent_parallel?: number
+          claude_hooks?: false | "user" | "all"
           auto_mode?: boolean
           policies?: Array<{
             action: "provider.use" | "tool.use" | "integration.use"

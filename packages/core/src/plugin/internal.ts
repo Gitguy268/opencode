@@ -104,6 +104,7 @@ import { VcsGitPlugin } from "./vcs/git.js"
 import { VerbosityPlugin } from "./verbosity.js"
 import { GoalPlugin } from "./goal.js"
 import { AutoModePlugin } from "./auto-mode.js"
+import { ClaudeHooksPlugin } from "./claude-hooks.js"
 import { InstructionEntry } from "../session/instruction-entry.js"
 import { SkillMentionPlugin } from "./skill-mention.js"
 import { WarmingPlugin } from "./warming.js"
@@ -230,6 +231,7 @@ const pre = [
   PlanPlugin.Plugin,
   GoalPlugin.Plugin,
   AutoModePlugin.Plugin,
+  ClaudeHooksPlugin.Plugin,
   CommandPlugin.Plugin,
   SkillPlugin.Plugin,
   VcsHgPlugin.Plugin,

@@ -134,6 +134,27 @@ CLI-only plugins are configured separately and remain active when connected to a
 }
 ```
 
+## Claude Code hooks
+
+OpenCode runs command hooks from your `~/.claude/settings.json`, so hooks written for Claude Code keep working. Four events are supported:
+
+| Claude Code event | Runs | Blocking (exit code 2, or `"decision": "block"`) |
+| --- | --- | --- |
+| `PreToolUse` | Before a tool call | Rejects the call; the reason goes to the model. `hookSpecificOutput.permissionDecision: "deny"` also blocks. |
+| `PostToolUse` | After a successful tool call | Adds the reason to the tool result |
+| `UserPromptSubmit` | Before a prompt is sent | Cannot block. Output and `additionalContext` are added to the prompt. |
+| `Stop` | After a run succeeds | Sends the reason as a new prompt so the agent continues. `stop_hook_active` is set on the next stop; after 20 continuations in a row, the session stops anyway. |
+
+Matchers are tool-name regexes, using Claude's tool names: `Bash`, `Edit`, `Write`, `Read`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`. Hooks get Claude's JSON on stdin, with `file_path`, `old_string` and the other snake_case input keys, plus `CLAUDE_PROJECT_DIR` in the environment. Each hook times out after its `timeout` (default 60 seconds). `allow` and `ask` decisions are ignored, so OpenCode's own permission rules still decide. Other events and non-command hooks are skipped.
+
+Hooks in a project's `.claude/settings.json` and `.claude/settings.local.json` are commands written by whoever made the repository, so they do not run unless you opt in:
+
+```jsonc title="opencode.jsonc"
+{
+  "experimental": { "claude_hooks": "all" }, // "user" (default), "all", or false
+}
+```
+
 <Card title="Build a plugin" href="/build/plugins">
   Create plugins that add tools, hooks, integrations, commands, agents, and other behavior.
 </Card>

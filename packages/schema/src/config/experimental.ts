@@ -15,6 +15,12 @@ export class Info extends Schema.Class<Info>("ConfigExperimental.Info")({
     description:
       "Maximum subagents one session runs at the same time; further subagent calls wait for a free slot. Unlimited by default.",
   }),
+  claude_hooks: Schema.Union([Schema.Literal(false), Schema.Literals(["user", "all"])])
+    .pipe(optional)
+    .annotate({
+      description:
+        'Run Claude Code hooks (PreToolUse, PostToolUse, UserPromptSubmit, Stop) from ~/.claude/settings.json ("user", the default), also from project .claude/settings.json and settings.local.json ("all"), or not at all (false).',
+    }),
   auto_mode: Schema.Boolean.pipe(optional).annotate({
     description:
       "Let a model review permission prompts for routine tool actions and approve safe ones. Uncertain or risky requests still ask. Defaults to false.",

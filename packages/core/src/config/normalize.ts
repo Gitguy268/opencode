@@ -485,6 +485,15 @@ function normalizeExperimental(
         )
         if (value !== undefined) result.subagent_parallel = value
       }
+      if (own(experimental, "claude_hooks")) {
+        const value = decodeEncoded(
+          ConfigExperimental.Info.fields.claude_hooks,
+          experimental.claude_hooks,
+          ["experimental", "claude_hooks"],
+          diagnostics,
+        )
+        if (value !== undefined) result.claude_hooks = value
+      }
       if (own(experimental, "auto_mode")) {
         const value = decodeEncoded(
           ConfigExperimental.Info.fields.auto_mode,

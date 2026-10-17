@@ -14184,6 +14184,18 @@
                 "type": "integer",
                 "exclusiveMinimum": 0
               },
+              "claude_hooks": {
+                "anyOf": [
+                  {
+                    "type": "boolean",
+                    "enum": [false]
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["user", "all"]
+                  }
+                ]
+              },
               "auto_mode": {
                 "type": "boolean"
               },
