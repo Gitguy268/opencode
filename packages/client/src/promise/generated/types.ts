@@ -2336,6 +2336,7 @@ export type ConfigEntry =
           subagent_depth?: number
           subagent_parallel?: number
           claude_hooks?: false | "user" | "all"
+          sandbox?: boolean
           auto_mode?: boolean
           policies?: Array<{
             action: "provider.use" | "tool.use" | "integration.use"

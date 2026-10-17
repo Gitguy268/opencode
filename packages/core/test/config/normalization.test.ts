@@ -525,6 +525,7 @@ describe("ConfigNormalize", () => {
     expect(normalized({ experimental: { claude_hooks: "all" } }).encoded.experimental).toEqual({ claude_hooks: "all" })
     expect(normalized({ experimental: { claude_hooks: false } }).encoded.experimental).toEqual({ claude_hooks: false })
     expect(normalized({ experimental: { claude_hooks: "project" } }).encoded.experimental).toBeUndefined()
+    expect(normalized({ experimental: { sandbox: true } }).encoded.experimental).toEqual({ sandbox: true })
     const invalid = normalized({ experimental: { auto_mode: "yes" } })
     expect(invalid.encoded.experimental).toBeUndefined()
     expect(invalid.diagnostics.map((item) => item.path)).toContainEqual(["experimental", "auto_mode"])

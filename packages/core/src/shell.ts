@@ -15,6 +15,7 @@ import { FileRetention } from "./file-retention.js"
 import { Location } from "./location.js"
 import { Global } from "@opencode/util/global"
 import { ShellSelect } from "./shell/select.js"
+import { ShellSandbox } from "./shell/sandbox.js"
 import type { ShellCreateBefore } from "@opencode/plugin/effect/shell"
 import { PluginHooks } from "./plugin/hooks.js"
 import { SessionEnvironment } from "./session/environment.js"
@@ -276,6 +277,14 @@ const layer = () =>
 
         const id = Shell.ID.ascending()
         const args = ShellSelect.args(invocation.shell, invocation.command)
+        // Wrapped here, after the permission scan, so allow rules still see the user's own command.
+        // shortcut: covers the shell tool only; pty, MCP stdio, formatters and file edits are not sandboxed.
+        const spawned =
+          process.platform === "darwin" &&
+          location.workspaceID === undefined &&
+          Config.latest(yield* config.entries(), "experimental")?.sandbox === true
+            ? ShellSandbox.wrap(invocation.shell, args, [location.project.directory, invocation.cwd])
+            : { file: invocation.shell, args }
         const file = path.join(outputDir, `${id}.out`)
 
         const info: Info = {
@@ -298,7 +307,7 @@ const layer = () =>
             Effect.gen(function* () {
               const handle = yield* environment.spawner
                 .spawn(
-                  ChildProcess.make(invocation.shell, args, {
+                  ChildProcess.make(spawned.file, spawned.args, {
                     cwd: invocation.cwd,
                     env: invocation.env,
                     stdin: "ignore",

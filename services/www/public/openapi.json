@@ -14274,6 +14274,9 @@
                   }
                 ]
               },
+              "sandbox": {
+                "type": "boolean"
+              },
               "auto_mode": {
                 "type": "boolean"
               },

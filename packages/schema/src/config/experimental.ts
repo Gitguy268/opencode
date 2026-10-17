@@ -21,6 +21,10 @@ export class Info extends Schema.Class<Info>("ConfigExperimental.Info")({
       description:
         'Run Claude Code hooks (PreToolUse, PostToolUse, UserPromptSubmit, Stop) from ~/.claude/settings.json ("user", the default), also from project .claude/settings.json and settings.local.json ("all"), or not at all (false).',
     }),
+  sandbox: Schema.Boolean.pipe(optional).annotate({
+    description:
+      "macOS only: run shell tool commands under sandbox-exec so they can write only to the project, the working directory, temp directories and package caches. Network access is unchanged. Defaults to false.",
+  }),
   auto_mode: Schema.Boolean.pipe(optional).annotate({
     description:
       "Let a model review permission prompts for routine tool actions and approve safe ones. Uncertain or risky requests still ask. Defaults to false.",

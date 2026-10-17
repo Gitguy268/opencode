@@ -312,6 +312,18 @@ requests are never reviewed.
 The review uses the default model, and each reviewed request costs one small
 model call.
 
+## Sandbox
+
+On macOS, `experimental.sandbox` runs every shell tool command under `sandbox-exec`. The command can then write only to the project, its working directory, temp directories, `/dev`, and package-manager caches (`~/.bun`, `~/.npm`, `~/.cache`, `~/.yarn`, `~/.cargo`, `~/Library/Caches`). Reading files and network access are unchanged.
+
+```jsonc title="opencode.jsonc"
+{
+  "experimental": { "sandbox": true },
+}
+```
+
+The sandbox wraps the command after permission rules are checked, so `shell` allow rules still match your own command text. It covers the shell tool only: terminals you open, MCP servers, formatters and the edit and write tools are not sandboxed. Other platforms ignore the setting.
+
 ## Policies
 
 A [policy](/policies) can hard-deny a permission check after these rules and saved

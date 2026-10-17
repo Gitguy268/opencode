@@ -494,6 +494,15 @@ function normalizeExperimental(
         )
         if (value !== undefined) result.claude_hooks = value
       }
+      if (own(experimental, "sandbox")) {
+        const value = decodeEncoded(
+          ConfigExperimental.Info.fields.sandbox,
+          experimental.sandbox,
+          ["experimental", "sandbox"],
+          diagnostics,
+        )
+        if (value !== undefined) result.sandbox = value
+      }
       if (own(experimental, "auto_mode")) {
         const value = decodeEncoded(
           ConfigExperimental.Info.fields.auto_mode,
