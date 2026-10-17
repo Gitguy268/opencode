@@ -5,6 +5,7 @@ import { WebSearch } from "@opencode/core/websearch"
 import { WebSearchExa } from "@opencode/core/plugin/websearch/exa"
 import { WebSearchFirecrawl } from "@opencode/core/plugin/websearch/firecrawl"
 import { WebSearchParallel } from "@opencode/core/plugin/websearch/parallel"
+import { WebSearchSearXNG } from "@opencode/core/plugin/websearch/searxng"
 import { WebSearchTavily } from "@opencode/core/plugin/websearch/tavily"
 import { WebSearchTinyFish } from "@opencode/core/plugin/websearch/tinyfish"
 import { host, integrationHost, webSearchHost } from "./host"
@@ -368,6 +369,49 @@ describe("built-in web search providers", () => {
         body: { method: "tools/call" },
       })
       expect(requests[3]?.headers["x-tinyfish-access-mode"]).toBeUndefined()
+    }),
+  )
+
+  it.effect("registers SearXNG only when SEARXNG_URL is set and queries its JSON API", () =>
+    Effect.gen(function* () {
+      const integrations = yield* Integration.Service
+      const websearch = yield* WebSearch.Service
+      const previous = process.env.SEARXNG_URL
+      yield* Effect.addFinalizer(() =>
+        Effect.sync(() => {
+          if (previous === undefined) delete process.env.SEARXNG_URL
+          if (previous !== undefined) process.env.SEARXNG_URL = previous
+        }),
+      )
+      const load = () =>
+        WebSearchSearXNG.Plugin.effect(
+          host({ integration: integrationHost(integrations), websearch: webSearchHost(websearch) }),
+        )
+
+      delete process.env.SEARXNG_URL
+      yield* load()
+      expect((yield* websearch.providers()).map((provider) => provider.id)).not.toContain("searxng")
+
+      process.env.SEARXNG_URL = "http://127.0.0.1:8888"
+      resetWebSearchFixture(
+        JSON.stringify({
+          results: [
+            { title: "Effect", url: "https://effect.website", content: "Effect documentation", engine: "duckduckgo" },
+            { title: "No snippet", url: "https://example.com", content: null },
+          ],
+        }),
+      )
+      yield* load()
+      expect(yield* websearch.query({ query: "effect typescript", providerID: WebSearch.ID.make("searxng") })).toEqual(
+        new WebSearch.Response({
+          providerID: WebSearch.ID.make("searxng"),
+          results: [
+            { url: "https://effect.website", title: "Effect", content: "Effect documentation", time: {} },
+            { url: "https://example.com", title: "No snippet", time: {} },
+          ],
+        }),
+      )
+      expect(requests[0]?.url).toBe("http://127.0.0.1:8888/search?q=effect+typescript&format=json")
     }),
   )
 })
