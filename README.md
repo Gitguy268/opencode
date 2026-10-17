@@ -65,6 +65,7 @@ Inline skills, hooks, auto mode, the sandbox, the subagent cap and SearXNG are a
 <summary>Limits and things not done</summary>
 
 - Session goals and auto mode were tested with stubbed models only, not against a live model.
+- Local builds are versioned `0.0.0-<branch>-<date>`, and OpenCode Zen's free tier refuses them ("OpenCode 1.18.0 or newer is required"). Connect your own provider with `/connect` to use a model.
 - A `UserPromptSubmit` hook cannot block a prompt. Its block reason is added to the prompt as context instead.
 - The sandbox covers the shell tool only. Terminals, MCP servers, formatters and file edits are not sandboxed, network access is unchanged, and it does nothing on Linux or Windows.
 - `/context` counts tools before plugin hooks, so `goal_complete` appears in the list even though requests without a goal leave it out.
