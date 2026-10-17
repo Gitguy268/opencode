@@ -69,6 +69,7 @@ import { statusLabel } from "../../component/dialog-workspace-file-changes"
 import { DialogMessage } from "./dialog-message"
 import { DialogFork } from "./dialog-fork"
 import { DialogTimeline } from "./dialog-timeline"
+import { DialogFind } from "./dialog-find"
 import { Composer } from "./composer"
 import { filetype } from "../../util/filetype"
 import parsers from "../../parsers-config"
@@ -931,6 +932,15 @@ export function Session(props: {
             setPrompt={(value) => promptRef.current?.set(value)}
           />
         ))
+      },
+    },
+    {
+      title: "Find in session",
+      id: "session.find",
+      group: "Session",
+      slash: { name: "find", aliases: ["search"] },
+      run: () => {
+        dialog.replace(() => <DialogFind sessionID={route.sessionID} onMove={jumpToMessage} />)
       },
     },
     {
