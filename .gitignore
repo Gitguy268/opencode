@@ -41,3 +41,4 @@ tsconfig.tsbuildinfo
 .env.*
 !.env.example
 node_modules/
+services/changelog/.wrangler/
