@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>opencode</title>
+<meta name="description" content="">
+<style>
+:root { color-scheme: light dark; --bg:#fff; --fg:#1f2328; --muted:#59636e; --line:#d1d9e0; --code:#f6f8fa; --link:#0550ae; }
+@media (prefers-color-scheme: dark) { :root { --bg:#0d1117; --fg:#e6edf3; --muted:#9198a1; --line:#30363d; --code:#161b22; --link:#79c0ff; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+main { max-width:860px; margin:0 auto; padding:24px 16px 64px; overflow-wrap:break-word; }
+.bar { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-bottom:12px; margin-bottom:24px; border-bottom:1px solid var(--line); font-size:14px; color:var(--muted); }
+a { color:var(--link); }
+img { max-width:100%; height:auto; }
+pre { background:var(--code); padding:14px 16px; border-radius:8px; overflow:auto; }
+code { background:var(--code); padding:.15em .35em; border-radius:4px; font:.88em ui-monospace,SFMono-Regular,Menlo,monospace; }
+pre code { background:none; padding:0; }
+table { display:block; overflow:auto; border-collapse:collapse; }
+th,td { border:1px solid var(--line); padding:6px 12px; text-align:left; }
+blockquote { margin:16px 0; padding:0 16px; border-left:4px solid var(--line); color:var(--muted); }
+h1,h2 { border-bottom:1px solid var(--line); padding-bottom:.3em; line-height:1.25; }
+summary { cursor:pointer; font-weight:600; }
+</style>
+</head>
+<body>
+<main>
+<div class="bar"><span>Project page</span><a href="https://github.com/Gitguy268/opencode">View on GitHub</a></div>
+<p align="center">
+  <a href="https://opencode.ai">
+    <picture>
+      <source srcset="https://raw.githubusercontent.com/Gitguy268/opencode/lean-features/packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
+      <source srcset="https://raw.githubusercontent.com/Gitguy268/opencode/lean-features/packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
+      <img src="https://raw.githubusercontent.com/Gitguy268/opencode/lean-features/packages/console/app/src/asset/logo-ornate-light.svg" alt="OpenCode logo">
+    </picture>
+  </a>
+</p>
+<p align="center">The open source AI coding agent.</p>
+<p align="center">
+  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
+  <a href="https://www.npmjs.com/package/@opencode/cli"><img alt="npm" src="https://img.shields.io/npm/v/@opencode/cli?style=flat-square" /></a>
+  <a href="https://github.com/anomalyco/opencode/actions/workflows/publish.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/opencode/publish.yml?style=flat-square&branch=dev" /></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.md">English</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.zh.md">简体中文</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.zht.md">繁體中文</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.ko.md">한국어</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.de.md">Deutsch</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.es.md">Español</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.fr.md">Français</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.it.md">Italiano</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.da.md">Dansk</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.ja.md">日本語</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.pl.md">Polski</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.ru.md">Русский</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.bs.md">Bosanski</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.ar.md">العربية</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.no.md">Norsk</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.br.md">Português (Brasil)</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.th.md">ไทย</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.tr.md">Türkçe</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.uk.md">Українська</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.bn.md">বাংলা</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.gr.md">Ελληνικά</a> |
+  <a href="https://github.com/Gitguy268/opencode/blob/lean-features/README.vi.md">Tiếng Việt</a>
+</p>
+
+<p><a href="https://opencode.ai"><img src="https://raw.githubusercontent.com/Gitguy268/opencode/lean-features/packages/web/src/assets/lander/screenshot.png" alt="OpenCode Terminal UI"></a></p>
+<hr>
+<h3 id="about-this-fork">About this fork</h3>
+<p>This is a personal fork of <a href="https://github.com/anomalyco/opencode">anomalyco/opencode</a>, on branch <code>lean-features</code>. It is not built by the OpenCode team and is not affiliated with them. It adds the following to the TUI and the desktop and web app:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>How to use it</th>
+<th>Upstream request</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Session goals</td>
+<td><code>/goal &lt;text&gt;</code> sets a goal and starts work. The agent keeps going after each successful run until it calls <code>goal_complete</code>, you run <code>/goal clear</code>, or 20 unattended turns pass. If it is blocked it pauses, keeping the goal, and your next message resumes it. The goal shows in the TUI sidebar and the app header.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/27167">#27167</a></td>
+</tr>
+<tr>
+<td>Context breakdown</td>
+<td><code>/context</code> estimates the tokens used by the system prompt, each instruction source, each tool and the messages, and shows the session cost including subagents.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/6152">#6152</a></td>
+</tr>
+<tr>
+<td>Transcript search (TUI)</td>
+<td><code>/find</code> (or <code>/search</code>) searches user and assistant text and jumps to the message. The app already had Cmd+F.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/4714">#4714</a></td>
+</tr>
+<tr>
+<td>Inline skills</td>
+<td>Type <code>$skill-id</code> or <code>$skill-name</code> in a prompt to load that skill. Text that matches no skill, like <code>$HOME</code>, is left alone.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/15617">#15617</a></td>
+</tr>
+<tr>
+<td>Claude Code hooks</td>
+<td><code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code> and <code>Stop</code> hooks from <code>~/.claude/settings.json</code> run. Project hooks need <code>&quot;experimental&quot;: { &quot;claude_hooks&quot;: &quot;all&quot; }</code>.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/12472">#12472</a></td>
+</tr>
+<tr>
+<td>Auto mode</td>
+<td><code>&quot;experimental&quot;: { &quot;auto_mode&quot;: true }</code> lets the default model approve routine permission prompts. Anything risky or unclear still asks.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/37564">#37564</a></td>
+</tr>
+<tr>
+<td>Subagent cap</td>
+<td><code>&quot;experimental&quot;: { &quot;subagent_parallel&quot;: 2 }</code> limits how many subagents one session runs at once.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/27110">#27110</a></td>
+</tr>
+<tr>
+<td>Shell sandbox (macOS)</td>
+<td><code>&quot;experimental&quot;: { &quot;sandbox&quot;: true }</code> lets shell commands write only to the project, temp folders and package caches.</td>
+<td><a href="https://github.com/anomalyco/opencode/issues/2242">#2242</a></td>
+</tr>
+<tr>
+<td>SearXNG search</td>
+<td>Set <code>SEARXNG_URL</code> (for example <code>http://127.0.0.1:8888</code>), then choose <code>&quot;websearch&quot;: { &quot;provider&quot;: &quot;searxng&quot; }</code>.</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<p>Inline skills, hooks, auto mode, the sandbox, the subagent cap and SearXNG are also documented in <code>services/www/src/docs/content</code> (<code>skills.mdx</code>, <code>plugins.mdx</code>, <code>permissions.mdx</code>, <code>tools.mdx</code>, <code>websearch.mdx</code>). <code>/goal</code>, <code>/context</code> and <code>/find</code> are documented only here.</p>
+<details>
+<summary>Limits and things not done</summary>
+
+<ul>
+<li>Session goals and auto mode were tested with stubbed models only, not against a live model.</li>
+<li>Local builds are versioned <code>0.0.0-&lt;branch&gt;-&lt;date&gt;</code>, and OpenCode Zen&#39;s free tier refuses them (&quot;OpenCode 1.18.0 or newer is required&quot;). Connect your own provider with <code>/connect</code> to use a model.</li>
+<li>A <code>UserPromptSubmit</code> hook cannot block a prompt. Its block reason is added to the prompt as context instead.</li>
+<li>The sandbox covers the shell tool only. Terminals, MCP servers, formatters and file edits are not sandboxed, network access is unchanged, and it does nothing on Linux or Windows.</li>
+<li><code>/context</code> counts tools before plugin hooks, so <code>goal_complete</code> appears in the list even though requests without a goal leave it out.</li>
+<li>There is no <code>$</code> autocomplete in the prompt yet.</li>
+<li>Clickable links in the TUI were already upstream, so nothing was added for them.</li>
+</ul>
+</details>
+
+<details>
+<summary>Startup and memory</summary>
+
+<p>Measured on an M-series Mac with <code>bun script/bench-startup.ts &lt;binary&gt;</code>, which runs the server with throwaway data folders. TUI numbers come from launching the TUI with <code>--standalone</code> in a terminal emulator. Each figure is the median of 3 runs, comparing this fork against the upstream commit it is based on (<code>8c173a8f3</code>).</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Upstream</th>
+<th>This fork</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Server boot to ready</td>
+<td>182 ms</td>
+<td>189 ms</td>
+</tr>
+<tr>
+<td>Server memory, idle</td>
+<td>120 MB</td>
+<td>139 MB</td>
+</tr>
+<tr>
+<td>Server memory, 3 projects open</td>
+<td>299 MB</td>
+<td>329 MB</td>
+</tr>
+<tr>
+<td>TUI time to prompt</td>
+<td>1.64 s</td>
+<td>1.73 s</td>
+</tr>
+<tr>
+<td>TUI and its server, memory</td>
+<td>433 MB</td>
+<td>413 MB</td>
+</tr>
+</tbody></table>
+<p>Run-to-run differences are around ±40 MB, so the two builds perform the same. The fork adds features without measurable cost, but it does not make opencode faster. About two thirds of the memory belongs to the server process (about 260–310 MB). Idle projects are already unloaded after 60 minutes upstream. Running the TUI and server in one process would save roughly one Bun runtime, but it would break the built-in terminal, and the desktop app needs the separate server, so that was not done. Flags such as <code>OPENCODE_DISABLE_MODELS_FETCH</code> changed memory by less than the noise.</p>
+</details>
+
+<details>
+<summary>Building and testing this fork</summary>
+
+<pre><code class="language-bash">bun install                                   # bun 1.4.x
+cd packages/cli &amp;&amp; bun run script/build.ts --single --skip-install
+./dist/cli-darwin-arm64/bin/opencode          # or: bun dev (from packages/cli)
+</code></pre>
+<p>Run tests per package, never from the repository root, for example <code>cd packages/core &amp;&amp; bun test</code>. Run <code>bun run check</code> at the root for lint and typecheck.</p>
+</details>
+
+<hr>
+<h3 id="installation">Installation</h3>
+<pre><code class="language-bash"># YOLO
+curl -fsSL https://opencode.ai/install | bash
+
+# Package managers
+npm i -g @opencode/cli@latest      # or bun/pnpm/yarn
+scoop install opencode             # Windows
+choco install opencode             # Windows
+brew install anomalyco/tap/opencode # macOS and Linux (recommended, always up to date)
+brew install opencode              # macOS and Linux (official brew formula, updated less)
+sudo pacman -S opencode            # Arch Linux (Stable)
+paru -S opencode-bin               # Arch Linux (Latest from AUR)
+mise use -g opencode               # Any OS
+nix run nixpkgs#opencode           # or github:anomalyco/opencode for latest dev branch
+</code></pre>
+<blockquote>
+<p>[!TIP]
+Remove versions older than 0.1.x before installing.</p>
+</blockquote>
+<h3 id="desktop-app-beta">Desktop App (BETA)</h3>
+<p>OpenCode is also available as a desktop application. Download directly from the <a href="https://github.com/anomalyco/opencode/releases">releases page</a> or <a href="https://opencode.ai/download">opencode.ai/download</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Download</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>macOS (Apple Silicon)</td>
+<td><code>opencode-desktop-mac-arm64.dmg</code></td>
+</tr>
+<tr>
+<td>macOS (Intel)</td>
+<td><code>opencode-desktop-mac-x64.dmg</code></td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>opencode-desktop-windows-x64.exe</code></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>.deb</code>, <code>.rpm</code>, or <code>.AppImage</code></td>
+</tr>
+</tbody></table>
+<pre><code class="language-bash"># macOS (Homebrew)
+brew install --cask opencode-desktop
+# Windows (Scoop)
+scoop bucket add extras; scoop install extras/opencode-desktop
+</code></pre>
+<h4 id="installation-directory">Installation Directory</h4>
+<p>The install script respects the following priority order for the installation path:</p>
+<ol>
+<li><code>$OPENCODE_INSTALL_DIR</code> - Custom installation directory</li>
+<li><code>$XDG_BIN_DIR</code> - XDG Base Directory Specification compliant path</li>
+<li><code>$HOME/bin</code> - Standard user binary directory (if it exists or can be created)</li>
+<li><code>$HOME/.opencode/bin</code> - Default fallback</li>
+</ol>
+<pre><code class="language-bash"># Examples
+OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
+XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+</code></pre>
+<h3 id="agents">Agents</h3>
+<p>OpenCode includes two built-in agents you can switch between with the <code>Tab</code> key.</p>
+<ul>
+<li><strong>build</strong> - Default, full-access agent for development work</li>
+<li><strong>plan</strong> - Read-only agent for analysis and code exploration<ul>
+<li>Denies file edits by default</li>
+<li>Asks permission before running bash commands</li>
+<li>Ideal for exploring unfamiliar codebases or planning changes</li>
+</ul>
+</li>
+</ul>
+<p>Also included is a <strong>general</strong> subagent for complex searches and multistep tasks.
+This is used internally and can be invoked using <code>@general</code> in messages.</p>
+<p>Learn more about <a href="https://opencode.ai/docs/agents">agents</a>.</p>
+<h3 id="documentation">Documentation</h3>
+<p>For more info on how to configure OpenCode, <a href="https://opencode.ai/docs"><strong>head over to our docs</strong></a>.</p>
+<h3 id="contributing">Contributing</h3>
+<p>If you&#39;re interested in contributing to OpenCode, please read our <a href="https://github.com/Gitguy268/opencode/blob/lean-features/CONTRIBUTING.md">contributing docs</a> before submitting a pull request.</p>
+<h3 id="building-on-opencode">Building on OpenCode</h3>
+<p>If you are working on a project that&#39;s related to OpenCode and is using &quot;opencode&quot; as part of its name, for example &quot;opencode-dashboard&quot; or &quot;opencode-mobile&quot;, please add a note to your README to clarify that it is not built by the OpenCode team and is not affiliated with us in any way.</p>
+<hr>
+<p><strong>Join our community</strong> <a href="https://discord.gg/opencode">Discord</a> | <a href="https://x.com/opencode">X.com</a></p>
+<!-- live-links -->
+<p><strong>Project page:</strong> <a href="https://gitguy268.github.io/opencode/">gitguy268.github.io/opencode</a> · <a href="https://opencode-navy-nu.vercel.app">opencode-navy-nu.vercel.app</a></p>
+<!-- /live-links -->
+
+<!-- run-steps:start -->
+<h2 id="run-it-locally-step-by-step">Run it locally, step by step</h2>
+<ol>
+<li><p><strong>Install <a href="https://bun.sh">Bun</a>.</strong></p>
+</li>
+<li><p><strong>Get the code:</strong></p>
+<pre><code class="language-sh">git clone https://github.com/Gitguy268/opencode.git
+cd opencode
+</code></pre>
+</li>
+<li><p><strong>Install the dependencies:</strong></p>
+<pre><code class="language-sh">bun install
+</code></pre>
+</li>
+<li><p><strong>Start it:</strong></p>
+<pre><code class="language-sh">bun run dev
+</code></pre>
+</li>
+</ol>
+<!-- run-steps:end -->
+
+
+</main>
+</body>
+</html>
