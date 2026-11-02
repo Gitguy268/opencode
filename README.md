@@ -190,3 +190,29 @@ If you are working on a project that's related to OpenCode and is using "opencod
 ---
 
 **Join our community** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
+
+<!-- run-steps:start -->
+## Run it locally, step by step
+
+1. **Install [Bun](https://bun.sh).**
+
+2. **Get the code:**
+
+   ```sh
+   git clone https://github.com/Gitguy268/opencode.git
+   cd opencode
+   ```
+
+3. **Install the dependencies:**
+
+   ```sh
+   bun install
+   ```
+
+4. **Start it:**
+
+   ```sh
+   bun run dev
+   ```
+<!-- run-steps:end -->
+
