@@ -191,6 +191,10 @@ If you are working on a project that's related to OpenCode and is using "opencod
 
 **Join our community** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
 
+<!-- live-links -->
+**Project page:** [gitguy268.github.io/opencode](https://gitguy268.github.io/opencode/) · [opencode-navy-nu.vercel.app](https://opencode-navy-nu.vercel.app)
+<!-- /live-links -->
+
 <!-- run-steps:start -->
 ## Run it locally, step by step
 
